@@ -339,8 +339,8 @@ function App() {
         <img
           src={
             nodes.length && rootId
-              ? "/freelancer-neon.svg"
-              : "/freelancer-neon-off.svg"
+              ? "./freelancer-neon.svg"
+              : "./freelancer-neon-off.svg"
           }
           alt="Freelancer Enterprise"
           onClick={() => {
