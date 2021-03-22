@@ -60,7 +60,7 @@ function generateNodeDepth(
 }
 
 function App() {
-  let dimensions = { x: window.innerWidth, y: 2000 };
+  let dimensions = { x: Math.max(window.innerWidth, 2500), y: 2000 };
   const colsize = 180;
   let columns = Math.floor(dimensions.x / colsize) - 1;
   if (columns % 2 === 0) {
