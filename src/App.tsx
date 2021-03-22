@@ -92,12 +92,28 @@ function App() {
     setRootId(selected.phid);
   };
 
+  const setRoadmap = async (id: string) => {
+    setRootId(undefined);
+    const response = await phabricator("maniphest.search", {
+      constraints: {
+        ids: [id.slice(2)],
+      },
+    });
+    const tasks = response.result.data;
+    const selected = tasks[Math.floor(Math.random() * tasks.length)];
+    setNodes([]);
+    setRootId(selected.phid);
+  };
+
   useEffect(() => {
     if (window.location.hash) {
-      setRootId(window.location.hash);
+      setTimeout(() => setRoadmap(window.location.hash), 1000);
     } else {
       setTimeout(randomiseRoadmap, 1000);
     }
+    document.addEventListener("hashchange", () =>
+      setRoadmap(window.location.hash)
+    );
   }, []);
 
   useEffect(() => {
