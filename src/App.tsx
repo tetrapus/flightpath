@@ -1,9 +1,10 @@
 import { Connectors } from "./Connectors";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { phabricator, User } from "./phabricator";
 import { Node } from "./Node";
 import { AnnotatedNode } from "./AnnotatedNode";
 import { Allocation } from "./Allocation";
+import createPanZoom from "panzoom";
 
 function bisect<T>(arr: T[], predicate: (elem: T) => boolean) {
   const trues: T[] = [];
@@ -77,6 +78,22 @@ function App() {
     document.addEventListener("keydown", listener);
     return () => document.removeEventListener("keydown", listener);
   }, []);
+
+  const viewerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (viewerRef.current) {
+      const panzoom = createPanZoom(viewerRef.current, {
+        maxZoom: 1,
+        minZoom: 0.1,
+        initialX: ((dimensions.x - window.innerWidth) / 2) * 10,
+        initialY: 0,
+        initialZoom: 1,
+        bounds: true,
+        autocenter: true,
+      });
+      return () => panzoom.dispose();
+    }
+  }, [dimensions.x]);
 
   const [rootId, setRootId] = useState<string | undefined>();
   const [nodes, setNodes] = useState<Node[]>([]);
@@ -331,7 +348,7 @@ function App() {
   );
 
   return (
-    <div style={{ color: "white" }}>
+    <div style={{ color: "white" }} ref={viewerRef}>
       <Connectors nodes={nodes} dimensions={dimensions} />
       <div
         style={{
@@ -368,8 +385,8 @@ function App() {
             left: (dimensions.x - colsize * columns) / 2 + (x + 0.5) * colsize,
             top: 170 + 150 * y,
             fontSize: 12,
-            transform: "translateX(-50%) translateY(-50%)",
             display: "flex",
+            alignItems: "center",
           }}
         >
           <div
@@ -402,7 +419,7 @@ function App() {
             <div
               style={{
                 background: "rgba(0, 0, 0, 0.3)",
-                margin: 4,
+                margin: 6,
                 maxWidth: 100,
                 textAlign: "center",
               }}

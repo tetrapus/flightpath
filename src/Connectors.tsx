@@ -110,13 +110,16 @@ function connectAll(lineSets: Line[][]) {
   }
 }
 
-var cumulativeOffset = function (element: HTMLElement) {
-  return {
-    x:
-      element.getBoundingClientRect().left +
-      document.documentElement.scrollLeft,
-    y: element.getBoundingClientRect().top + document.documentElement.scrollTop,
-  };
+var cumulativeOffset = function (element: HTMLElement | null) {
+  var top = 0,
+    left = 0;
+  while (element) {
+    top += element.offsetTop || 0;
+    left += element.offsetLeft || 0;
+    element = element.parentNode as HTMLElement | null;
+  }
+
+  return { x: left, y: top };
 };
 
 export function Connectors({
@@ -177,10 +180,13 @@ export function Connectors({
   }, [canvasRef, nodes]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={`${dimensions.x}px`}
-      height={`${dimensions.y}px`}
-    ></canvas>
+    <>
+      <canvas
+        ref={canvasRef}
+        width={`${dimensions.x}px`}
+        height={`${dimensions.y}px`}
+      ></canvas>
+      <svg width={`${dimensions.x}px`} height={`${dimensions.y}px`}></svg>
+    </>
   );
 }
