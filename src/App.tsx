@@ -260,11 +260,20 @@ function App() {
               (allocation) => parentAllocation.y === allocation.y
             );
             const neighbours = [
-              ...parentAllocation.node.requiredBy,
-              ...parentAllocation.node.requires,
+              ...parentAllocation.node.requiredBy.map((id) => ({
+                id,
+                weight: 0.3,
+              })),
+              ...parentAllocation.node.requires.map((id) => ({
+                id,
+                weight: 1,
+              })),
             ]
-              .map((link) => allocated.find((a) => a.node.id === link))
-              .filter((x) => x);
+              .map((link) => ({
+                node: allocated.find((a) => a.node.id === link.id),
+                weight: link.weight,
+              }))
+              .filter((x) => x.node);
 
             const free = [
               ...Array.from(new Array(columns).keys()).filter(
@@ -275,7 +284,7 @@ function App() {
               .map((x) => ({
                 value: x,
                 score: neighbours
-                  .map((a) => Math.abs((a?.x || 0) - x))
+                  .map((a) => Math.abs((a.node?.x || 0) - x) * a.weight)
                   .reduce((a, b) => a + b, 0),
               }))
               .sort((a, b) => a.score - b.score);
